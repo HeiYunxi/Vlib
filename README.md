@@ -13,8 +13,8 @@
 - Learning文件夹：课程理论资料
 - vlib：项目开发文件夹
 
-最终项目查看[FinalVlib](http://https://gitee.com/heiyunxi/vlib/tree/master/vlib/FinailVlib)；
-PDM查看[PDWorkpace](http://https://gitee.com/heiyunxi/vlib/tree/master/vlib/PD%20Workpace)
+最终项目查看[FinalVlib](https://gitee.com/heiyunxi/vlib/tree/master/vlib/FinailVlib)；
+PDM查看[PDWorkpace](https://gitee.com/heiyunxi/vlib/tree/master/vlib/PD%20Workpace)
 
 - 提交：提交内容
 - 文件：开发周期产生的文件材料
