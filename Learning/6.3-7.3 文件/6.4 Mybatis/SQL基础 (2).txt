@@ -1,0 +1,53 @@
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) DEFAULT NULL,
+  `birthday` date DEFAULT NULL,
+   `sex` varchar(2) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+ PRIMARY KEY (`id`)
+);
+
+insert into users (username,birthday,sex,address) values ('xiewei','19990112','0','重庆邮电大学')
+insert into users (username,birthday,sex,address) values ('zhangsan','20090112','0','重庆邮电大学')
+insert into users (username,birthday,sex,address) values ('lisi','20110112','1','重庆邮电大学')
+update users set sex='1' where id=2
+delete from users where id=2;
+select * from users order by birthday;-- 顺序排序
+select * from users order by birthday asc;-- 顺序排序
+select * from users order by birthday desc;-- 顺序排序
+
+select sex from users group by sex;
+select sex,count(*) from users group by sex;
+select username,(case when sex='0' then '男' else '女' end) as newsex from users；
+select project,(case when score<60 then '不及格' when score>=60 and score<70 then '合格' when score>=70 and score<85 then '良' else '优' end) newscore,score from score;
+
+select * from users a,score b where b.studentid=a.id;-- 外连接
+
+select * from users a left join score b on b.studentid=a.id; -- 左连接
+
+select * from (
+select a.username from (select a.username,a.id,b.project,b.score,b.studentid from users a left join score b on b.studentid=a.id ) a where a.project is null
+) a left join score b on b.studentid=1 -- 左连接
+
+select sex,count(*) from users group by sex having count(*)>1
+
+select concat(username,address) from users;
+select concat(username,'#',address) from users;
+select count(*) from users;
+select * from users LIMIT 0,2
+select * from users LIMIT 0,3
+
+select * from score;
+select * from score LIMIT 0,3;
+select * from score LIMIT 3,3;
+
+
+
+select username from users where id not in (select studentid from score)
+-- 查询users表没有参加考试的用户名字，并显示没考试的科目名称（以考试科目最多的用户为标准）
+select c.username,(case when c.id='1'  then c.project else '' end) proj from (
+select username,project from 
+(select id,username from users where id not in (select studentid from score) ) a LEFT JOIN score b on b.studentid='1'
+) c group by c.username
+
+select (case when studentid is not null then  project else '' end) from score

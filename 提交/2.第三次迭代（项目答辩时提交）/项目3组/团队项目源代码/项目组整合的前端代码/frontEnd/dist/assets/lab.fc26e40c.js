@@ -1,0 +1,1 @@
+import{h as e}from"./http.f2a51fde.js";const s=t=>e.post("/lab/list",t),a=t=>e.post("/lab/update",t),r=t=>e.post("/lab/delete",t),o=t=>e.post("/lab/detail",t),n=t=>e.post("/lab/save",t),b=t=>e.post("/lab/getManagerList",t),p={getLabList:s,delLab:r,getLabDetail:o,updateLab:a,saveLabInfo:n,getlabUserList:b};export{p as u};

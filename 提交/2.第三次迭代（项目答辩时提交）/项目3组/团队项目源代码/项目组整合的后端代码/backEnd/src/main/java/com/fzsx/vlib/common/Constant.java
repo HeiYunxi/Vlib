@@ -1,0 +1,29 @@
+package com.fzsx.vlib.common;
+
+/**
+ * 常量类
+ */
+public class Constant {
+
+    //供应商
+    public static final String SUPPLIER="supplier";
+
+    //类别
+    public static final String SIMEQ_TYPE="simeqtype";
+
+    //用户类型
+    public static final String USER_TYPE="userType";
+
+    public static final String USER_STUDENT="1";//用户类型 学生
+    public static final String USER_TEACHER="2";//用户类型 老师
+    public static final String USER_MANAGER="3";//用户类型 管理员
+
+
+    //请假状态
+    public static final String LEAVE_PASS="通过";
+    public static final String LEAVE_REJECT="拒批";
+    public static final String LEAVE_DRAFT="草稿";
+    public static final String LEAVE_WITHDROW="撤回";
+    public static final String LEAVE_UNAPPROVED="未审批";
+
+}

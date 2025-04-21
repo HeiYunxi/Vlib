@@ -1,0 +1,1 @@
+import{h as t}from"./http.67206c72.js";const n=e=>t.post("/menu/list",e),u=e=>t.post("/menu/update",e),s=e=>t.post("/menu/delete",e),o=e=>t.post("/menu/detail",e),r=e=>t.post("/menu/saveMenuInfo",e),a={saveMenuInfo:r,getMenuList:n,delMenu:s,getMenuDetail:o,updateMenu:u};export{a as u};

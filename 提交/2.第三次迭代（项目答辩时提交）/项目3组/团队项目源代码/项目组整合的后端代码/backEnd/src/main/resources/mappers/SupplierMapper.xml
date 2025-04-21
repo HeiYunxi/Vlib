@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fzsx.vlib.mapper.SupplierMapper">
+    <!--插入供应商-->
+    <insert id="saveSupplierInfo"  parameterType="com.fzsx.vlib.entity.Supplier">
+        insert into supplier
+            (supplierName,contact,phone,email,address,create_time,update_time)
+        values (#{supplierName},#{contact},#{phone},#{email},#{address},#{create_time},#{update_time})
+    </insert>
+
+    <select id="getEquipmentByEquipmentNumber" resultType="com.fzsx.vlib.entity.Equipment">
+        select `equipmentId`,`equipmentName`,`equipmentNumber` from user where equipmentNumber = #{value}
+    </select>
+
+
+    <!-- 供应商信息分页查询-->
+    <select id="querySupplierList" parameterType="com.fzsx.vlib.entity.Supplier" resultType="com.fzsx.vlib.entity.Supplier">
+        select * from supplier
+        <where>
+            <if test="supplierName != null and supplierName != ''">
+                and supplierName  like concat('%', #{supplierName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <delete id="delete"  parameterType="com.fzsx.vlib.entity.Supplier">
+        delete from supplier where supplierId=#{supplierId}
+    </delete>
+
+    <!-- 供应商详细信息-->
+    <select id="detail" parameterType="com.fzsx.vlib.entity.Supplier" resultType="com.fzsx.vlib.entity.Supplier">
+        select * from supplier
+        <where>
+            <if test="supplierId != null and supplierId != ''">
+                and supplierId = #{supplierId}
+            </if>
+        </where>
+    </select>
+
+    <!--更新供应商信息 -->
+    <update id="update"  parameterType="com.fzsx.vlib.entity.Supplier">
+        update supplier
+        set
+        <if test="supplierName != null and supplierName != ''">
+            supplierName=#{supplierName},
+        </if>
+        <if test="contact != null and contact != ''">
+            contact=#{contact},
+        </if>
+        <if test="phone != null and phone != ''">
+            phone=#{phone},
+        </if>
+        <if test="email != null and email != ''">
+            email=#{email},
+        </if>
+        <if test="address != null and address != ''">
+            address=#{address},
+        </if>
+        <if test="create_time != null ">
+            create_time=#{create_time},
+        </if>
+        <if test="update_time != null">
+            update_time=#{update_time}
+        </if>
+
+        where supplierId=#{supplierId}
+    </update>
+
+    <!-- 所有供应商信息-->
+    <select id="supplierList" parameterType="int" resultType="com.fzsx.vlib.entity.Supplier">
+        select supplierId,supplierName from supplier
+    </select>
+
+    <!-- 查询设备供应商信息-->
+    <select id="equipmentSupplierList" parameterType="int" resultType="com.fzsx.vlib.entity.Supplier">
+        select supplierId,(select supplierName from supplier b where b.supplierId=a.supplierId) supplierName  from equipment_supplier a
+        <where>
+            <if test="equipmentId != null and equipmentId != ''">
+                and equipmentId=#{equipmentId}
+            </if>
+        </where>
+    </select>
+
+    <!-- 按设备ID删除设备供应商信息-->
+    <delete id="deleteEquipmentSupplier" parameterType="int">
+        delete   from equipment_supplier
+        <where>
+            <if test="equipmentId != null and equipmentId != ''">
+                and equipmentId=#{equipmentId}
+            </if>
+        </where>
+    </delete>
+
+
+    <!-- 按设备ID删除设备供应商信息-->
+    <delete id="deleteSupplierEquipment" parameterType="int">
+        delete   from equipment_supplier
+        <where>
+            <if test="supplierId != null and supplierId != ''">
+                and supplierId=#{supplierId}
+            </if>
+        </where>
+    </delete>
+
+    <insert id="saveEquipmentSupplierInfo"  parameterType="java.util.HashMap">
+        insert into equipment_supplier (equipmentId,supplierId) values (#{equipmentId},#{supplierId})
+    </insert>
+
+    <!-- 查询设备供应商信息-->
+    <select id="getSupplierEquipmentList" parameterType="int" resultType="com.fzsx.vlib.entity.Equipment">
+        select equipmentId from  equipment_supplier
+        <where>
+            <if test="supplierId != null and supplierId != ''">
+                and supplierId=#{supplierId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

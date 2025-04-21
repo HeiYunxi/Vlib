@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fzsx.vlib.mapper.DataViewMapper">
+
+    <select id="getCountData" resultType="java.util.Map">
+            select count(1) as countNum,r.roleName
+            from user u join user_role ur on  u.userId = ur.userId
+                        join role r on r.roleId=ur.roleId
+            group by r.roleId
+    </select>
+    <select id="equipmentSupplierCount" resultType="java.lang.Integer">
+        select count(1)
+        from supplier;
+    </select>
+    <select id="equipmentCount" resultType="java.lang.Integer">
+        select count(1)
+        from equipment;
+    </select>
+    <select id="equipmentLabCount" resultType="java.lang.Integer">
+        select count(1)
+        from lab;
+    </select>
+    <select id="getBarData" resultType="java.util.Map">
+        select count(1) as countNum,r.roleName
+        from user u join user_role ur on  u.userId = ur.userId
+                    join role r on r.roleId=ur.roleId
+        group by r.roleId
+    </select>
+    <select id="getPieData" resultType="java.util.Map">
+        select count(1) as value,
+               CASE
+                   WHEN status = 1 THEN '可用'
+                   WHEN status = 2 THEN '正在维护'
+                   ELSE '其他'
+                   END
+                as name
+        from equipment
+        group by status;
+    </select>
+    <select id="getColumnarData" resultType="java.util.Map">
+        select capacity as value,
+               labName as name
+        from lab
+    </select>
+
+    <select id="getLineData" resultType="java.util.Map">
+        select res.*
+        from (SELECT COUNT(1) AS count,
+  DATE_FORMAT(MIN(a.reviewDatetime), '%Y-%m-%d') AS reviewDatetime
+              FROM
+                  apply a
+                  JOIN apply_lab al
+              ON a.applyId = al.applyId
+              WHERE
+                  reviewDatetime IS NOT NULL
+              GROUP BY
+                  YEAR (a.reviewDatetime),
+                  MONTH (a.reviewDatetime),
+                  DAY (a.reviewDatetime)
+              ORDER BY
+                  reviewDatetime DESC
+                  LIMIT 7) res
+        order by res.reviewDatetime;
+    </select>
+</mapper>

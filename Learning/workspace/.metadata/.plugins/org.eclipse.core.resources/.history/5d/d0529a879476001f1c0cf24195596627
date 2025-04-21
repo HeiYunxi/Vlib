@@ -1,0 +1,170 @@
+package com.gui;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import com.domain.Operation;
+import com.domain.OperationAdd;
+import com.domain.OperationCbrt;
+import com.domain.OperationCos;
+import com.domain.OperationDivide;
+import com.domain.OperationModulus;
+import com.domain.OperationMultiply;
+import com.domain.OperationPower;
+import com.domain.OperationSin;
+import com.domain.OperationSqrt;
+import com.domain.OperationSubtract;
+import com.domain.OperationTan;
+
+public class CalculatorsMain extends JFrame {
+    private JTextField displayField;
+    private StringBuilder currentInput;
+    
+    public CalculatorsMain() {
+        currentInput = new StringBuilder();
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        setTitle("简易计算器");
+        setSize(400, 400);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        
+        displayField = new JTextField();
+        displayField.setEditable(false);
+        add(displayField, BorderLayout.NORTH);
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(6, 4));
+        
+        String[] buttons = {
+            "7", "8", "9", "/",
+            "4", "5", "6", "*",
+            "1", "2", "3", "+",
+            "C", "0", "=", "-",
+            "sin", "cos", "tan", 
+            "pow","sqrt", "cbrt",
+            "%"
+        };
+        
+        for (String text : buttons) {
+            JButton button = new JButton(text);
+            button.addActionListener(new ButtonClickListener());
+            buttonPanel.add(button);
+        }
+        
+        add(buttonPanel, BorderLayout.CENTER);
+    }
+    
+    private class ButtonClickListener implements ActionListener {
+    	@Override
+    	public void actionPerformed(ActionEvent e) {
+    	    String command = e.getActionCommand();
+    	    if ("C".equals(command)) {
+    	        currentInput.setLength(0);
+    	        displayField.setText("");
+    	    } else if ("=".equals(command)) {
+    	        calculateResult();
+    	    } else {
+    	        if (!currentInput.toString().isEmpty() && !command.matches("\\d")) {
+    	            currentInput.append(" "); // 添加空格分隔符
+    	        }else {
+    	        currentInput.append(command);}
+    	        displayField.setText(currentInput.toString());
+    	    }
+    	}
+
+    }
+    
+    private void calculateResult() {
+        String expression = currentInput.toString().trim();
+        String[] tokens = expression.split(" ");
+        
+        if (tokens.length == 0) return; // 输入为空
+
+        Operation operation = null;
+
+        if (tokens.length == 3) { // 双目运算
+            double a = Double.parseDouble(tokens[0]);
+            String operator = tokens[1];
+            double b = Double.parseDouble(tokens[2]);
+
+            switch (operator) {
+                case "+":
+                    operation = new OperationAdd();
+                    break;
+                case "-":
+                    operation = new OperationSubtract();
+                    break;
+                case "*":
+                    operation = new OperationMultiply();
+                    break;
+                case "/":
+                    operation = new OperationDivide();
+                    break;
+                case "%":
+                    operation = new OperationModulus();
+                    break;
+                case "pow":
+                    operation = new OperationPower();
+                    break;
+            }
+
+            if (operation != null) {
+                operation.setNumA(a);
+                operation.setNumB(b);
+            }
+
+        } else if (tokens.length == 2) { // 单目运算
+            String operator = tokens[0];
+            double a = Double.parseDouble(tokens[1]);
+
+            switch (operator) {
+                case "sin":
+                    operation = new OperationSin();
+                    break;
+                case "cos":
+                    operation = new OperationCos();
+                    break;
+                case "tan":
+                    operation = new OperationTan();
+                    break;
+                case "sqrt":
+                    operation = new OperationSqrt();
+                    break;
+                case "cbrt":
+                    operation = new OperationCbrt();
+                    break;
+            }
+
+            if (operation != null) {
+                operation.setNumA(a);
+            }
+        }
+
+        if (operation != null) {
+            try {
+                double result = operation.getResult();
+                displayField.setText(String.valueOf(result));
+            } catch (Exception ex) {
+                displayField.setText("错误");
+            }
+        } else {
+            displayField.setText("错误");
+        }
+
+        currentInput.setLength(0); // 清空输入
+    }
+
+
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            CalculatorsMain calculator = new CalculatorsMain();
+            calculator.setVisible(true);
+        });
+    }
+}

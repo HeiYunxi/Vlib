@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fzsx.vlib.mapper.ApplyMapper">
+
+    <!--查询待审批的申请-->
+    <select id="searchApplyStatus" parameterType="com.fzsx.vlib.entity.Apply">
+        select *
+        from apply
+        where applyId = #{applyId}
+          and applyStatus = 0
+    </select>
+
+    <!---获取申请Id-->
+    <select id="getApplyId" resultType="int">
+        select applyId
+        from apply
+        where applyNum = #{applyNum}
+--           and applyStatus = 0
+    </select>
+
+    <!--插入：保存到申请表中，但是不保存到另外的表中-->
+    <insert id="insert" parameterType="com.fzsx.vlib.entity.Apply">
+        insert into apply
+        (applyNum, applyDay, applyReason,
+         applyStatus, applyDatetime, reviewComments, reviewDatetime, userId)
+        values (#{applyNum}, #{applyDay}, #{applyReason},
+                #{applyStatus}, #{applyDatetime}, #{reviewComments}, #{reviewDatetime}, #{userId})
+    </insert>
+
+    <!-- 申请详细信息-->
+    <select id="detail" parameterType="com.fzsx.vlib.entity.Apply" resultType="map">
+        SELECT A.*,C.labName,C.labNumber,C.managerId
+        FROM apply_lab B
+        INNER JOIN apply A ON A.applyId = B.applyId
+        INNER JOIN lab C ON C.labId = B.labId
+        <where>
+            <if test="applyId != null and applyId != ''">
+                and A.applyId = #{applyId}
+            </if>
+        </where>
+    </select>
+
+    <!--提交：保存到申请表中，也报错到提交表中-->
+    <insert id="submit" parameterType="com.fzsx.vlib.entity.Apply">
+        insert into apply_lab
+        (applyId, labId)
+        values (#{apply.applyId}, #{labId})
+    </insert>
+
+    <!-- 删除申请：删除申请表中的条目-->
+    <delete id="delete" parameterType="com.fzsx.vlib.entity.Apply">
+        delete from apply
+        where applyId = #{applyId}
+    </delete>
+
+    <!--编辑更新申请 -->
+    <update id="update" parameterType="com.fzsx.vlib.entity.Apply">
+        update apply
+        set
+        <if test="applyDay != null and applyDay != ''">
+            applyDay=#{applyDay},
+        </if>
+        <if test="applyReason != null and applyReason != ''">
+            applyReason=#{applyReason},
+        </if>
+        <if test="applyStatus != null ">
+            applyStatus=#{applyStatus},
+        </if>
+        <if test="applyDatetime != null">
+            applyDatetime=#{applyDatetime}
+        </if>
+
+        where applyId=#{applyId}
+    </update>
+
+    <!-- 撤回申请：删除提交表中的条目-->
+    <delete id="withDrawApply" parameterType="com.fzsx.vlib.entity.Apply">
+        delete from apply_lab
+           where applyId = #{applyId}
+    </delete>
+
+    <!--更新申请表中申请状态 -->
+    <update id="reviewApply" parameterType="com.fzsx.vlib.entity.Apply">
+        update apply
+        set
+        <if test="applyStatus != null and applyStatus != ''">
+            applyStatus=#{applyStatus},
+        </if>
+        <if test="reviewComments != null and reviewComments != ''">
+            reviewComments=#{reviewComments},
+        </if>
+        <if test="reviewDatetime != null">
+            reviewDatetime=#{reviewDatetime}
+        </if>
+        where applyId=#{applyId}
+    </update>
+
+    <!-- 申请信息分页查询-->
+    <select id="queryApplyList" parameterType="com.fzsx.vlib.entity.Apply"
+            resultType="com.fzsx.vlib.entity.Apply">
+
+    </select>
+
+
+    <!-- 查询用户的申请信息-->
+    <select id="queryUserApplyList" parameterType="com.fzsx.vlib.entity.Apply"
+            resultType="map">
+        select * from
+        (
+        SELECT A.*,C.labName
+        FROM apply_lab B
+        INNER JOIN apply A ON A.applyId = B.applyId
+        INNER JOIN lab C ON C.labId = B.labId
+        ) as D
+        where userId = #{apply.userId}
+        <if test="apply.applyStatus != -1 ">
+            and applyStatus  =#{apply.applyStatus}
+        </if>
+        <if test="labName != null and labName != ''">
+            and labName  like concat('%', #{labName}, '%')
+        </if>
+    </select>
+
+    <!-- 查询实验室名-->
+    <select id="selectLabName" resultType="String">
+        SELECT A.labName
+        FROM apply_lab B
+                 INNER JOIN lab A ON A.labId = B.labId
+        where B.applyId = #{applyId}
+    </select>
+
+
+    <!-- 查询实验室审批信息-->
+    <select id="querySubmitApplyList" resultType="map">
+        select *
+        from(
+                select e.* , user.userName
+                from (
+                        select c.*,d.managerId,d.labName
+                        from apply c,
+                        (
+                                select a.*, b.applyId
+                                from lab a,
+                                apply_lab b
+                                where a.labId = b.labId
+                        ) d
+                    where d.applyId=c.applyId
+                    and d.managerId = #{managerId}
+                ) as e, user
+                where user.userId=e.userId
+                <if test="apply.applyStatus != -1">
+                    and applyStatus=#{apply.applyStatus}
+                </if>
+        ) f
+        <if test="userName != null and userName != ''">
+            where f.userName=#{userName}
+        </if>
+        group by applyId
+    </select>
+
+
+
+
+</mapper>

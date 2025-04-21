@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间,对应mapper层文件-->
+<mapper namespace="com.example.demo.mapper.UserMapper">
+    <!--
+        useGeneratedKeys:需要接收返回值
+        keyColumn：数据库的列名
+        keyProperty：domain上的属性名
+    -->
+
+
+    <select id="getUser" resultType="com.example.demo.entity.User">
+        select * from user
+        <where>
+            <if test="username!=null and username!=''">
+               and username like concat('%', #{username}, '%')
+            </if>
+            <if test="password!=null and password!=''">
+               and  password=#{password}
+            </if>
+            <if test="id!=null and id!=''">
+                and  id=#{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="getUserList"  resultType="com.example.demo.entity.User">
+        select id,username,password,
+        (case when roleid='1' then '管理员' else '普通用户' end) roleid,
+        (case when status='1' then '有效' else '无效' end) status from user
+        <where>
+            <if test="username!=null and username!=''">
+                and username=#{username}#
+            </if>
+        </where>
+        limit #{current},#{size}
+    </select>
+    
+<select id="queryUserList"  resultType="com.example.demo.entity.User">
+        select id,username,password,
+        (case when roleid='1' then '管理员' else '普通用户' end) roleid,
+        (case when status='1' then '有效' else '无效' end) status from user
+    </select>
+  
+  <select id="getUserListTotal"  resultType="java.lang.Integer">
+        select count(*) from user
+        <where>
+            <if test="username!=null and username!=''">
+                and username =#{username}
+            </if>
+        </where>
+
+    </select>
+
+    <insert id="saveUser" parameterType="com.example.demo.entity.User">
+        insert into user(username,password,roleid,status) values (#{username},#{password},#{roleid},#{status})
+    </insert>
+    <insert id="updateUser" parameterType="com.example.demo.entity.User">
+        update user set
+        username=#{username},
+        password=#{password},
+        roleid=#{roleid},
+        status=#{status}
+        where id=#{id}
+    </insert>
+    <delete id="delUser" >
+        delete from user
+        where id=#{id}
+    </delete>
+</mapper>

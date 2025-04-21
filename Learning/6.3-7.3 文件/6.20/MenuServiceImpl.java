@@ -1,0 +1,55 @@
+package com.cqupt.service.impl;
+
+
+import com.cqupt.entity.MenuEntity;
+import com.cqupt.mapper.MenuMapper;
+import com.cqupt.service.IMenuService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+
+@Service
+@Transactional
+public class MenuServiceImpl implements IMenuService {
+    @Autowired
+    MenuMapper menuMapper;
+
+    @Override
+    public MenuEntity get(int menuId) {
+        return menuMapper.get(menuId);
+    }
+
+    @Override
+    public List<MenuEntity> list(Map<String, Object> map) {
+        return menuMapper.list(map);
+    }
+
+    @Override
+    public List<MenuEntity> listByRoleId(int[] roleIds) {
+        return menuMapper.listByRoleId(roleIds);
+    }
+
+    @Override
+    public List<MenuEntity> listByUserId(int userId) {
+        return menuMapper.listByUserId(userId);
+    }
+
+    @Override
+    public int save(MenuEntity menu) {
+        return menuMapper.save(menu);
+    }
+
+    @Override
+    public int update(MenuEntity menu) {
+        return menuMapper.update(menu);
+    }
+
+    @Override
+    public int remove(int menuId) {
+        return menuMapper.remove(menuId);
+    }
+
+}

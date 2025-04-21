@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fzsx.vlib.mapper.UserMapper">
+    <select id="UserInfo" resultType="com.fzsx.vlib.entity.User">
+        select * from user
+    </select>
+    <!--用户信息注册-->
+    <insert id="saveUserInfo" parameterType="com.fzsx.vlib.entity.User">
+        insert into user(userName,account,email,password,intro,phone,create_time,update_time,type)
+        values(#{userName}, #{account}, #{email}, #{password},#{intro},#{phone},#{create_time},#{update_time},#{type});
+    </insert>
+    <select id="getUserByAccountName" resultType="com.fzsx.vlib.entity.User">
+        select userId,userName,phone,account from user where account = #{value}
+    </select>
+
+
+    <select id="getUserByLoginInfo" resultType="com.fzsx.vlib.entity.User">
+        select userId,userName,phone,account,create_time,type
+        from user
+        where account = #{account} and password = #{password}
+    </select>
+    <!--用户信息分页查询-->
+    <select id="queryUserList" parameterType="com.fzsx.vlib.entity.User" resultType="com.fzsx.vlib.entity.User">
+        select * from user
+        <where>
+            <if test="account != null and account != ''">
+                and account like concat('%', #{account}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>

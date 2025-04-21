@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fzsx.mapper.MenuMapper">
+
+	<select id="get" resultType="com.fzsx.entity.Menu">
+		select `menuId`,`cname`,`ename`,`path`,`component`,`icon`,`pid` 
+		from menu 
+		where menuId = #{menuId}
+	</select>
+
+	<select id="list" resultType="com.fzsx.entity.Menu">
+		select `menuId`,`cname`,`ename`,`path`,`component`,`icon`,`pid`,`create_date`,`update_date` from menu
+        <where>
+			<if test="menuId != null and menuId != ''"> and menuId = #{menuId} </if>
+			<if test="cname != null and cname != ''">  and cname = #{cname}</if>
+		  	<if test="ename != null and ename != ''"> and ename = #{ename} </if>
+		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by sort asc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<insert id="save" parameterType="com.fzsx.entity.Menu" >
+		insert into menu
+		(
+			`cname`,
+			`ename`,
+			`path`,
+			`component`,
+			`icon`,
+			`pid`,
+			`sort`,
+            `create_time`,
+			`update_time`
+		)
+		values		(#{cname},
+			#{ename},
+			#{path},
+			#{component},
+			#{icon},
+			#{pid},
+			#{sort},
+			#{create_time},
+			#{update_time}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.fzsx.entity.Menu">
+		update menu
+		<set>
+			<if test="cname != null">`cname` = #{cname}, </if>
+			<if test="ename != null">`ename` = #{ename}, </if>
+			<if test="path != null">`path` = #{path}, </if>
+			<if test="component != null">`component` = #{component}, </if>
+			<if test="icon != null">`icon` = #{icon}, </if>
+			<if test="pid != null">`pid` = #{pid}, </if>
+			<if test="sort != null">`sort` = #{sort} </if>
+		</set>
+		where menuId = #{menuId}
+	</update>
+	
+	<delete id="delete">
+		delete from menu where menuId = #{menuId}
+	</delete>
+
+	<select id="listByRoleId" resultType="com.fzsx.entity.Menu">
+		select DISTINCT m.menuid,m.cname,m.ename,m.path,m.component,m.icon,m.pid
+		from menu m,role_menu rm
+		where m.menuId=rm.menuId and rm.role_id in
+		<foreach item="roleId" collection="array" open="(" separator="," close=")">
+			#{roleId}
+		</foreach>
+	</select>
+
+	<select id="listByUserId" resultType="com.fzsx.entity.Menu">
+		SELECT DISTINCT
+	m.menuid,
+	m.cname,
+	m.ename,
+	m.path,
+	m.component,
+	m.icon,
+	m.pid
+FROM
+	menu m,
+	menu_role rm,
+	user_role ur
+WHERE
+	  m.menuid = rm.menuid
+AND ur.roleid = rm.roleid
+AND ur.userid= #{userId}
+	</select>
+
+	<!-- 菜单信息分页查询-->
+	<select id="queryMenuList" parameterType="com.fzsx.entity.Menu" resultType="com.fzsx.entity.Menu">
+		select * from menu
+		<where>
+			<if test="cname != null and cname != ''">
+				and cname  like concat('%', #{cname}, '%')
+			</if>
+			<if test="menuId != null and menuId != ''">
+				and menuId!= #{menuId}
+			</if>
+		</where>
+		order by pid,sort
+	</select>
+	<!-- 菜单详细信息-->
+	<select id="detail" parameterType="int" resultType="com.fzsx.entity.Menu">
+		select * from menu
+		<where>
+			<if test="menuId != null and menuId != ''">
+				and menuId=#{menuId}
+			</if>
+		</where>
+	</select>
+	<!-- 获取所有一级菜单信息-->
+	<select id="getMenuFrist" resultType="com.fzsx.entity.Menu">
+		select * from menu where cname='仿真系统'
+	</select>
+	<!-- 获取所有下级菜单信息-->
+	<select id="getMenuSon" parameterType="int" resultType="com.fzsx.entity.Menu">
+		select * from menu
+		<where>
+			<if test="menuId != null and menuId != ''">
+				and pid=#{menuId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 获取某个角色对应所有下级菜单信息-->
+	<select id="getRoleMenuSon" parameterType="java.util.Map" resultType="com.fzsx.entity.Menu">
+		select * from menu
+		<where>
+			<if test="menuId != null and menuId != ''">
+				and pid=#{menuId}
+			</if>
+			<if test="userId != null and userId != ''">
+				and menuId in (select menuId from menu_role where roleId in (select roleId from user_role where 
+				userId=#{userId}))
+			</if>
+		</where>
+	</select>
+	<!-- 获取角色对应菜单信息-->
+	<select id="getRoleMenu" parameterType="int" resultType="com.fzsx.entity.Menu">
+		select * from menu
+		<where>
+			<if test="roleId != null and roleId != ''">
+				and menuId in (select menuId from menu_role where roleId=#{roleId})
+			</if>
+		</where>
+	</select>
+	<delete id="deleteRoleMenu" parameterType="int">
+		delete from menu_role where roleId = #{roleId}
+	</delete>
+	<insert id="saveRoleMenuInfo" parameterType="java.util.HashMap" >
+     insert into menu_role (roleId,menuId) 
+     values (#{roleId},#{menuId})
+	</insert>
+	<!-- 获取菜单被使用情况记录数-->
+	<select id="getMenuByUse" parameterType="int" resultType="int">
+		select count(*) from menu_role
+		<where>
+			<if test="menuId != null and menuId != ''">
+				and menuId=#{menuId}
+			</if>
+		</where>
+	</select>
+</mapper>

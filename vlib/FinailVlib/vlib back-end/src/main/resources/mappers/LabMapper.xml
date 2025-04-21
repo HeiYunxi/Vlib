@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fzsx.vlib.mapper.LabMapper">
+    <insert id="saveLabInfo"  parameterType="com.fzsx.vlib.entity.Lab">
+        insert into lab
+            (labNumber,labName,position,capacity,managerId,area,create_time,update_time)
+        values (#{labNumber},#{labName},#{position},#{capacity},#{managerId},#{area},#{create_time},#{update_time})
+    </insert>
+
+    <!-- 用户信息分页查询-->
+    <select id="queryLabList" parameterType="com.fzsx.vlib.entity.Lab" resultType="com.fzsx.vlib.entity.Lab">
+        SELECT  DISTINCT A.*,C.userName
+        FROM  user_role B
+        INNER JOIN lab A ON A.managerId = B.userId
+        INNER JOIN user C ON C.userId = B.userId
+        <where>
+            <if test="labName != null and labName != ''">
+                and labName  like concat('%', #{labName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getLabNumber" resultType="com.fzsx.vlib.entity.Role">
+        select `labId`,`labName` from lab
+        where labNumber = #{value}
+    </select>
+
+
+    <delete id="delete"  parameterType="com.fzsx.vlib.entity.Lab">
+        delete from lab where labId=#{labId}
+    </delete>
+
+    <!-- 用户详细信息-->
+    <select id="detail" parameterType="com.fzsx.vlib.entity.Lab" resultType="map">
+        SELECT l.*, u.userName
+        FROM lab l
+            JOIN user u ON l.managerId = u.userId
+        <where>
+            <if test="labId != null and labId != ''">
+                and labId=#{labId}
+            </if>
+        </where>
+    </select>
+
+    <!--更新用户信息 -->
+    <update id="update"  parameterType="com.fzsx.vlib.entity.Lab">
+        update lab
+        set
+        <if test="labNumber != null and labNumber != ''">
+            labNumber=#{labNumber},
+        </if>
+        <if test="labName != null and labName != ''">
+            labName=#{labName},
+        </if>
+        <if test="position != null and position != ''">
+            position=#{position},
+        </if>
+        <if test="capacity != null and capacity != ''">
+            capacity=#{capacity},
+        </if>
+        <if test="managerId != null ">
+            managerId=#{managerId},
+        </if>
+        <if test="area != null and area != ''">
+            area=#{area},
+        </if>
+        <if test="create_time != null ">
+            create_time=#{create_time},
+        </if>
+        <if test="update_time != null">
+            update_time=#{update_time}
+        </if>
+
+        where labId = #{labId}
+    </update>
+
+    <!---获取实验室Id-->
+    <select id="getLabId" resultType="int">
+        select labId
+        from lab
+        where labNumber = #{labNumber}
+    </select>
+</mapper>

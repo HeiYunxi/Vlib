@@ -1,0 +1,18 @@
+数据库账号密码
+url=jdbc:mysql://localhost:3306/fzsx?useSSL=false
+username=root
+password=123456
+账号	                密码
+zhangsan3	abc_123
+lisi4	                abc_123
+xiewei2000	abc_123
+2232725178	abc_123
+2944381624	abc_123
+770632299	abc_123
+1152175645	abc_123
+2075245546	abc_123
+1	                1 
+xiaoming	                abc_123
+xiaohong	                abc_123
+xiaolan	                abc_123
+
